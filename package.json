@@ -11,10 +11,15 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "compresion": "^1.7.11",
     "express": "^4.21.1",
+    "helmet": "^8.0.0",
     "i": "^0.3.7",
+    "mongoose": "^8.8.2",
     "morgan": "^1.10.0",
-    "npm": "^10.9.1"
+    "npm": "^10.9.1",
+    "os": "^0.1.2",
+    "process": "^0.11.10"
   },
   "devDependencies": {
     "compression": "^1.7.5",
