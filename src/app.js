@@ -9,18 +9,14 @@ const morgan = require("morgan");
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // init database
 require("./dbs/init.mongodb");
 
 // init routes
-app.get("/", (req, res, next) => {
-    const strCompress = "Hello Fantipjs!";
-    return res.status(200).json({
-        message: "Welcom Fantipjs!",
-        metadata: strCompress.repeat(1000),
-  });
-});
+app.use('/', require('./routes'));
 
 // handle error
 
