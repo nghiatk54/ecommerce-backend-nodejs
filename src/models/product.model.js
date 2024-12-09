@@ -30,6 +30,8 @@ const productSchema = new Schema({
 }, {
     timestamps: true, collection: COLLECTION_NAME
 })
+// Create index for search
+productSchema.index({ product_name: 'text', product_description: 'text'})
 // Document middleware: runs before .save() and .create()...
 productSchema.pre('save', function (next) {
     this.product_slug = slugify(this.product_name, { lower: true })

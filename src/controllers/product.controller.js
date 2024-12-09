@@ -22,6 +22,72 @@ class ProductController {
             } )
         }).send(res)
     }
+    // Query draft product
+    /**
+     * @desc Get all drafts for shop
+     * @param {String} product_shop
+     * @param {Number} limit
+     * @param {Number} skip
+     * @return {JSON}
+     */
+    getAllDraftsForShop = async (req, res, next) => {
+        new SuccessResponse({
+            message: 'Get list Draft success',
+            metadata: await ProductServiceV2.findAllDraftsForShop({product_shop: req.user.userId})
+        }).send(res)
+    }
+    // Query published product
+    /**
+     * @desc Get all published for shop
+     * @param {String} product_shop
+     * @param {Number} limit
+     * @param {Number} skip
+     * @return {JSON}
+     */
+    getAllPublishedForShop = async (req, res, next) => {
+        new SuccessResponse({
+            message: 'Get list Published success',
+            metadata: await ProductServiceV2.findAllPublishedForShop({product_shop: req.user.userId})
+        }).send(res)
+    }
+    // Publish product
+    /**
+     * @desc Publish product by shop
+     * @param {String} product_id
+     * @param {String} product_shop
+     * @return {JSON}
+     */
+    publishProductByShop = async (req, res, next) => {
+        new SuccessResponse({
+            message: 'Publish product success',
+            metadata: await ProductServiceV2.publishProductByShop({product_shop: req.user.userId, product_id: req.params.id})
+        }).send(res)
+    }
+    // Un publish product
+    /**
+     * @desc Un publish product by shop
+     * @param {String} product_id
+     * @param {String} product_shop
+     * @return {JSON}
+     */
+    unPublishProductByShop = async (req, res, next) => {
+        new SuccessResponse({
+            message: 'Un publish product success',
+            metadata: await ProductServiceV2.unPublishProductByShop({product_shop: req.user.userId, product_id: req.params.id})
+        }).send(res)
+    }
+    // Query search product by user
+    /**
+     * @desc Get list search product by user
+     * @param {String} keySearch
+     * @return {JSON}
+     */
+    getListSearchProduct = async (req, res, next) => {
+        new SuccessResponse({
+            message: 'Get list search product success',
+            metadata: await ProductServiceV2.searchProductByUser(req.params)
+        }).send(res)
+    }
 }
 
 module.exports = new ProductController()
