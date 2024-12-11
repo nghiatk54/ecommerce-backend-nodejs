@@ -6,8 +6,12 @@ const { findAllDraftsForShop,
     publishProductByShop,
     findAllPublishedForShop,
     unPublishProductByShop,
-    searchProductByUser
+    searchProductByUser,
+    findAllProducts,
+    findProduct,
+    updateProductById
 } = require('../models/repositories/product.repo')
+const { removeUnderfinedObject, updateNestedObjectParser } = require('../utils')
 
 // define Factory class to create product
 class ProductFactory {
@@ -25,6 +29,12 @@ class ProductFactory {
         const productClass = ProductFactory.productRegistry[type]
         if (!productClass) throw new BadRequestError(`Invalid product type ${type}`)
         return new productClass(payload).createProduct()
+    }
+    // update product
+    static async updateProduct(type, productId, payload) {
+        const productClass = ProductFactory.productRegistry[type]
+        if(!productClass) throw new BadRequestError(`Invalid product type ${type}`)
+        return new productClass(payload).updateProduct(productId)
     }
     // publish product
     static async publishProductByShop({product_shop, product_id}) {
@@ -48,6 +58,18 @@ class ProductFactory {
     static async searchProductByUser({keySearch = ''}){
         return await searchProductByUser({keySearch})
     }
+    // Query find all products
+    static async findAllProducts({limit = 50, sort = 'ctime', page = 1, filter = {isPublished: true}}){
+        return await findAllProducts({
+            limit, sort, page, filter,
+            select: ['product_name', 'product_price', 'product_thumb']
+        })
+    }
+    // Query find product
+    static async findProduct({product_id}){
+        return await findProduct({product_id, unSelect: ['__v']})
+    }
+
 }
 // define base product class
 class Product {
@@ -70,6 +92,10 @@ class Product {
             _id: productId
         })
     }
+    // Update product
+    async updateProduct(productId, bodyUpdate) {
+        return await updateProductById({productId, bodyUpdate, model: product})
+    }
 }
 // define sub-class for different product types Clothing
 class Clothing extends Product {
@@ -82,6 +108,19 @@ class Clothing extends Product {
         const newProduct = await super.createProduct(newClothing._id)
         if (!newProduct) throw new BadRequestError("Create new Product error")
         return newProduct
+    }
+    async updateProduct(productId) {
+        // 1. Remove attr has null and underfined
+        const objectParams = removeUnderfinedObject(this)
+        // 2. Check placeholder update
+        if(objectParams.product_attributes){
+            // Update child
+            await updateProductById({productId,
+                 bodyUpdate: updateNestedObjectParser(objectParams.product_attributes),
+                 model: clothing})
+        }
+        const updateProduct = await super.updateProduct(productId, updateNestedObjectParser(objectParams))
+        return updateProduct
     }
 }
 // define sub-class for different product types Electronic
