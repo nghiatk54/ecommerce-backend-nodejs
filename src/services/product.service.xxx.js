@@ -2,6 +2,7 @@
 
 const { BadRequestError, ForbiddenError } = require('../core/error.response')
 const { product, clothing, electronic, furniture } = require('../models/product.model')
+const { insertInventory } = require('../models/repositories/inventory.repo')
 const { findAllDraftsForShop,
     publishProductByShop,
     findAllPublishedForShop,
@@ -87,10 +88,19 @@ class Product {
     }
     // create new product
     async createProduct(productId) {
-        return await product.create({
+        const newProduct = await product.create({
             ...this,
             _id: productId
         })
+        if (newProduct) {
+            // add product_stock in inventory collection
+            await insertInventory({
+                productId: newProduct._id,
+                shopId: this.product_shop,
+                stock: this.product_quantity
+            })
+        }
+        return newProduct
     }
     // Update product
     async updateProduct(productId, bodyUpdate) {
